@@ -1,62 +1,51 @@
-# Work Helper Frontend
+# WorkHelper Frontend
 
-React + TypeScript + Vite 기반의 법률/행정 보조 웹 서비스 프론트엔드입니다.
-백엔드(Spring Boot)와 REST API로 통신합니다.
+WorkHelper Frontend는 노동 문제를 겪는 사용자를 위한 React SPA입니다. 현재 저장소는 팀 공통 foundation과 directory skeleton 단계이며, 실제 비즈니스 기능과 화면은 아직 구현하지 않았습니다.
+
+## 기술 스택
+
+- Node.js 22.23.2
+- React 18.3.x
+- TypeScript 5.x
+- Vite 6.x
+- React Router 6.x
+- Axios 1.x
+- Zustand 5.x
 
 ## 실행 방법
 
-### 1. 의존성 설치
-
 ```bash
 npm install
-```
-
-### 2. 환경 변수 설정
-
-`.env.example` 파일을 참고하여 `.env` 파일을 생성합니다.
-
-```bash
-cp .env.example .env
-```
-
-| 변수명 | 설명 | 기본값 |
-| --- | --- | --- |
-| `VITE_API_BASE_URL` | 백엔드 API 기본 URL | `http://localhost:8080/api` |
-
-### 3. 개발 서버 실행
-
-```bash
+Copy-Item .env.example .env
 npm run dev
 ```
 
-### 4. 빌드 / 린트
+검증 및 미리보기 명령어입니다.
 
 ```bash
-npm run build   # 프로덕션 빌드
-npm run lint     # ESLint 검사
-npm run preview  # 빌드 결과 미리보기
+npm run lint
+npm run build
+npm run preview
 ```
 
-## 폴더 구조
+## 환경변수
 
-```
+| 변수명 | 설명 | 예시 |
+| --- | --- | --- |
+| `VITE_API_BASE_URL` | Spring Boot Backend origin | `http://localhost:8080` |
+
+기능별 API 함수는 API 설계서의 `/api/...` 경로를 그대로 사용합니다. 따라서 `VITE_API_BASE_URL`에는 `/api`를 포함하지 않습니다.
+
+## 구조
+
+```text
 src/
-├─ assets/                # 이미지, 아이콘 등 정적 리소스
-├─ components/
-│  ├─ common/             # 버튼 등 재사용 가능한 기본 UI 컴포넌트
-│  └─ layout/             # Header, Footer 등 레이아웃 컴포넌트
-├─ features/              # 도메인별 로직/컴포넌트 (auth, case, consultation, petition, community)
-├─ pages/                 # 도메인별 메인 뷰 페이지 컴포넌트
-├─ services/              # axios 인스턴스(api.ts) 및 도메인별 API 호출 함수
-├─ stores/                # 전역 상태(zustand) - 예: authStore
-├─ types/                 # 도메인별 TypeScript interface 정의
-└─ utils/                 # 날짜/문자열 등 공통 유틸 함수
+├─ app/       # Application root와 중앙 Router
+├─ pages/     # Route 단위 화면 조합
+├─ features/  # 도메인별 API, 컴포넌트, 타입, 상태
+└─ shared/    # 도메인 비종속 공통 코드
 ```
 
-### 핵심 도메인
+`features/auth`는 인증 전역 상태가 실제로 필요해질 때 `store`를 사용합니다. 다른 feature에는 필요한 하위 구조만 추가합니다.
 
-1. **Auth** - 로그인 / 회원가입
-2. **Case** - 사건 등록 및 목록 관리
-3. **Consultation** - AI 챗봇 기반 법률 상담
-4. **Petition** - OCR 서류 업로드 및 AI 진정서 생성/미리보기
-5. **Community** - 커뮤니티 게시판
+Frontend는 Spring Boot의 외부 `/api`만 호출합니다. Spring Boot와 FastAPI 간의 `/internal/ai/*` 계약, AI 처리, RAG, OCR/Vision 처리는 Frontend에서 직접 호출하거나 구현하지 않습니다.
