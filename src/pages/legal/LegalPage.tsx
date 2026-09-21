@@ -4,7 +4,7 @@ import { getLegalDocumentDetail, searchLegalDocuments } from '@/features/legal/a
 import type { LegalDocumentDetail, LegalDocumentSummary } from '@/features/legal/types/legalDocument'
 
 function SiteHeader() {
-  return <><div className="utility-bar"><span>대한민국 근로자를 위한 고용·노동 법률 서비스 플랫폼</span><span>로그인　|　회원가입　|　고객센터</span></div><header className="site-header"><Link className="site-brand" to="/"><b>W</b><strong>WorkHelper</strong></Link><nav><Link to="/legal-documents">AI 법률상담</Link><Link to="/cases/1/evidences">서류 분석/OCR</Link><span>진정서 작성</span><span>내 사건 관리</span><span>전문가 Q&amp;A</span></nav><button className="all-menu">▣　전체메뉴</button></header></>
+  return <><div className="utility-bar"><span>대한민국 근로자를 위한 고용·노동 법률 서비스 플랫폼</span><span>로그인　|　회원가입　|　고객센터</span></div><header className="site-header"><Link className="site-brand" to="/"><b>W</b><strong>WorkHelper</strong></Link><nav><Link to="/legal-documents">AI 법률상담</Link><Link to="/cases/1/evidences">서류 분석/OCR</Link><span>진정서 작성</span><span>내 사건 관리</span><Link to="/expert-qna">전문가 Q&amp;A</Link></nav><button className="all-menu">▣　전체메뉴</button></header></>
 }
 
 function SiteFooter() {
