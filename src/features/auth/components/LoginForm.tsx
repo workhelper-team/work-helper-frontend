@@ -7,7 +7,6 @@ export default function LoginForm() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [rememberMe, setRememberMe] = useState(false);
   
   const { setAuth } = useAuthStore();
   const navigate = useNavigate();
@@ -66,11 +65,7 @@ export default function LoginForm() {
           </button>
         </div>
 
-        <div className="flex justify-between items-center mb-6 text-xs">
-          <label className="flex items-center gap-1.5 text-slate-700 cursor-pointer">
-            <input type="checkbox" checked={rememberMe} onChange={(e) => setRememberMe(e.target.checked)} />
-            로그인 상태 유지
-          </label>
+        <div className="flex justify-end items-center mb-6 text-xs">
           <a href="#find" onClick={(e) => e.preventDefault()} className="text-blue-600 hover:underline">비밀번호 찾기</a>
         </div>
 

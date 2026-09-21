@@ -14,3 +14,18 @@ apiClient.interceptors.request.use((config) => {
 
   return config
 })
+
+apiClient.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (axios.isAxiosError(error) && error.response?.status === 401) {
+      useAuthStore.getState().clearAuth()
+
+      if (window.location.pathname !== '/login') {
+        window.location.replace('/login')
+      }
+    }
+
+    return Promise.reject(error)
+  },
+)
