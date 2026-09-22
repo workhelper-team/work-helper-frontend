@@ -301,36 +301,6 @@ export default function WorkHelperDashboard() {
         </div>
       )}
 
-      {/* 로그인 모달 */}
-      {activeModal === 'login' && (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-          <div className="bg-white w-full max-w-md rounded-2xl shadow-2xl p-6 relative">
-            <button onClick={() => setActiveModal(null)} className="absolute top-4 right-4 text-slate-400 hover:text-slate-600">
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
-            </button>
-            <h3 className="text-xl font-bold text-slate-900 mb-6">로그인 / 회원가입</h3>
-            <div className="space-y-4">
-              <div>
-                <label className="block text-xs font-medium text-slate-600 mb-1">이메일 계정</label>
-                <input type="email" placeholder="user@workhelper.kr" className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm" />
-              </div>
-              <div>
-                <label className="block text-xs font-medium text-slate-600 mb-1">비밀번호</label>
-                <input type="password" placeholder="••••••••" className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm" />
-              </div>
-              <button 
-                onClick={() => navigate('/login')}
-                className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2.5 rounded-lg font-medium text-sm transition shadow-sm"
-              >
-                로그인 (API: /api/auth/login)
-              </button>
-              <div className="text-center text-xs text-slate-500 mt-4">
-                아직 계정이 없으신가요? <button onClick={() => alert('POST /api/auth/signup 연결')} className="text-blue-600 font-medium">일반 회원가입</button> 또는 <button onClick={() => alert('POST /api/auth/expert-signup 연결')} className="text-blue-600 font-medium">노무사 신청</button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

@@ -7,18 +7,24 @@ export default function LoginForm() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   
   const { setAuth } = useAuthStore();
   const navigate = useNavigate();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (isSubmitting) return;
+
+    setIsSubmitting(true);
     try {
       const data = await loginApi({ email, password });
       setAuth(data.accessToken, data.user);
       navigate('/');
     } catch {
       alert('로그인 정보가 일치하지 않습니다.');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -65,12 +71,8 @@ export default function LoginForm() {
           </button>
         </div>
 
-        <div className="flex justify-end items-center mb-6 text-xs">
-          <a href="#find" onClick={(e) => e.preventDefault()} className="text-blue-600 hover:underline">비밀번호 찾기</a>
-        </div>
-
-        <button type="submit" className="w-full py-3.5 bg-slate-900 text-white rounded-lg font-bold text-sm hover:bg-slate-800 transition">
-          로그인
+        <button type="submit" disabled={isSubmitting} className="w-full py-3.5 bg-slate-900 text-white rounded-lg font-bold text-sm hover:bg-slate-800 transition disabled:opacity-50 disabled:cursor-not-allowed">
+          {isSubmitting ? '로그인 중...' : '로그인'}
         </button>
       </form>
 
