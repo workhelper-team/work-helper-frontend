@@ -10,6 +10,10 @@ import CaseCreatePage from '@/features/cases/pages/CaseCreatePage'
 import CaseDetailPage from '@/features/cases/pages/CaseDetailPage'
 import CaseConsultationPage from '@/features/cases/pages/CaseConsultationPage'
 
+import { EvidencePage } from '@/pages/evidence/EvidencePage'
+import { LegalPage } from '@/pages/legal/LegalPage'
+import { ExpertQnaPage } from '@/pages/expert/ExpertQnaPage'
+
 import { RouteGuard } from './RouteGuard'
 
 export function AppRouter() {
@@ -34,6 +38,21 @@ export function AppRouter() {
           <Route
             path="/cases/:caseId/consultation"
             element={<CaseConsultationPage />}
+          />
+
+          <Route
+            path="/cases/:caseId/evidences"
+            element={<EvidencePage />}
+          />
+
+          <Route
+            path="/legal-documents"
+            element={<LegalPage />}
+          />
+
+          <Route
+            path="/cases/:caseId/expert-qna"
+            element={<ExpertQnaPage />}
           />
         </Route>
 
