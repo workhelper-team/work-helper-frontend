@@ -18,10 +18,14 @@ export interface EvidenceSummary {
   createdAt: string
 }
 
+export interface EvidenceAnalysisResult {
+  analysisSummary?: string | null
+}
+
 export interface EvidenceDetail extends EvidenceSummary {
   fileUrl: string | null
   extractedText: string | null
-  analysisResult: unknown
+  analysisResult: EvidenceAnalysisResult | null
 }
 
 export type EvidenceUploadResponse = EvidenceSummary
@@ -29,6 +33,10 @@ export type EvidenceUploadResponse = EvidenceSummary
 export interface EvidenceAnalysisResponse {
   evidenceId: number
   extractedText: string | null
-  analysisResult: unknown
+  analysisResult: EvidenceAnalysisResult | null
   analysisStatus: EvidenceStatus
+}
+
+export interface EvidenceUpdateRequest {
+  extractedText: string
 }

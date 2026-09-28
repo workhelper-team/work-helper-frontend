@@ -6,6 +6,7 @@
 // ==========================================================
 
 import { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
 
 import { getCases } from '../api/casesApi'
 
@@ -54,13 +55,14 @@ export function CaseList() {
 
   // 사건이 없는 경우
   if (cases.length === 0) {
-    return <div>등록된 사건이 없습니다.</div>
+    return <div>등록된 사건이 없습니다. <Link to="/cases/new">새 사건 등록</Link></div>
   }
 
   // 사건 목록
   return (
     <div>
       <h2>내 사건 목록</h2>
+      <Link to="/cases/new">새 사건 등록</Link>
 
       {cases.map((item) => (
         <div key={item.caseId}>
@@ -75,6 +77,7 @@ export function CaseList() {
 
           {/* 사건 요약 */}
           {item.summary && <p>{item.summary}</p>}
+          <Link to={`/cases/${item.caseId}`}>사건 상세 보기</Link>
         </div>
       ))}
     </div>
