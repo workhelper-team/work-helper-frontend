@@ -18,7 +18,6 @@ const guides = [
 
 export default function MainPage() {
   const user = useAuthStore((state) => state.user)
-  const clearAuth = useAuthStore((state) => state.clearAuth)
   const isLoggedIn = Boolean(user)
   const navigate = useNavigate()
 
