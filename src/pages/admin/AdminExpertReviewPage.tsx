@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { ExpertApplication } from '@/features/auth/types/auth.types';
-import { getExpertApplicationsApi, getExpertLicenseFileApi, updateExpertStatusApi } from '@/features/auth/api/authApi';
+import { ExpertApplication } from '@/features/admin/types/expertApplication';
+import { getExpertApplicationsApi, getExpertLicenseFileApi, updateExpertStatusApi } from '@/features/admin/api/adminExpertApi';
 
 export default function AdminExpertReviewPage() {
   const [applications, setApplications] = useState<ExpertApplication[]>([]);

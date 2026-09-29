@@ -3,7 +3,7 @@ import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 import LoginPage from '@/pages/auth/LoginPage'
 import SignupPage from '@/pages/auth/SignupPage'
 import MainPage from '@/pages/MainPage'
-import AdminExpertReviewPage from '@/pages/expert/AdminExpertReviewPage'
+import AdminExpertReviewPage from '@/pages/admin/AdminExpertReviewPage'
 
 import CaseListPage from '@/pages/cases/CaseListPage'
 import CaseCreatePage from '@/pages/cases/CaseCreatePage'
