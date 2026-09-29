@@ -10,17 +10,33 @@ import CaseCreatePage from '@/features/cases/pages/CaseCreatePage'
 import CaseDetailPage from '@/features/cases/pages/CaseDetailPage'
 import CaseConsultationPage from '@/features/cases/pages/CaseConsultationPage'
 
+import ConsultationHistoryPage from '@/features/consultation/pages/ConsultationHistoryPage'
+import SavedConsultationPage from '@/features/consultation/pages/SavedConsultationPage'
+
 import { RouteGuard } from './RouteGuard'
 
 export function AppRouter() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<MainPage />} />
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/signup" element={<SignupPage />} />
+        <Route
+          path="/"
+          element={<MainPage />}
+        />
 
-        <Route element={<RouteGuard allowedRoles={['ADMIN']} />}>
+        <Route
+          path="/login"
+          element={<LoginPage />}
+        />
+
+        <Route
+          path="/signup"
+          element={<SignupPage />}
+        />
+
+        <Route
+          element={<RouteGuard allowedRoles={['ADMIN']} />}
+        >
           <Route
             path="/admin/experts"
             element={<AdminExpertReviewPage />}
@@ -28,16 +44,46 @@ export function AppRouter() {
         </Route>
 
         <Route element={<RouteGuard />}>
-          <Route path="/cases" element={<CaseListPage />} />
-          <Route path="/cases/new" element={<CaseCreatePage />} />
-          <Route path="/cases/:caseId" element={<CaseDetailPage />} />
+          <Route
+            path="/cases"
+            element={<CaseListPage />}
+          />
+
+          <Route
+            path="/cases/new"
+            element={<CaseCreatePage />}
+          />
+
+          <Route
+            path="/cases/:caseId"
+            element={<CaseDetailPage />}
+          />
+
           <Route
             path="/cases/:caseId/consultation"
             element={<CaseConsultationPage />}
           />
+
+          <Route
+            path="/consultations"
+            element={<ConsultationHistoryPage />}
+          />
+
+          <Route
+            path="/consultations/saved"
+            element={<SavedConsultationPage />}
+          />
         </Route>
 
-        <Route path="*" element={<Navigate to="/login" replace />} />
+        <Route
+          path="*"
+          element={
+            <Navigate
+              to="/login"
+              replace
+            />
+          }
+        />
       </Routes>
     </BrowserRouter>
   )
