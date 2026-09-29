@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { checkEmailAvailabilityApi, signupApi } from '../api/authApi';
 
@@ -14,6 +14,9 @@ export default function SignupForm() {
   const [signupType, setSignupType] = useState<'user' | 'expert'>(initialType);
   const [email, setEmail] = useState('');
   const [emailCheckStatus, setEmailCheckStatus] = useState<'idle' | 'checking' | 'available' | 'duplicate'>('idle');
+  const [checkedEmail, setCheckedEmail] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const emailRef = useRef(email);
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [name, setName] = useState('');
@@ -34,11 +37,18 @@ export default function SignupForm() {
       return;
     }
 
+    const requestedEmail = email;
     setEmailCheckStatus('checking');
+    setCheckedEmail('');
     try {
-      const isAvailable = await checkEmailAvailabilityApi(email);
+      const isAvailable = await checkEmailAvailabilityApi(requestedEmail);
+      if (emailRef.current !== requestedEmail) return;
+
       setEmailCheckStatus(isAvailable ? 'available' : 'duplicate');
+      setCheckedEmail(isAvailable ? requestedEmail : '');
     } catch {
+      if (emailRef.current !== requestedEmail) return;
+
       setEmailCheckStatus('idle');
       alert('이메일 중복확인 중 오류가 발생했습니다.');
     }
@@ -46,6 +56,8 @@ export default function SignupForm() {
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (isSubmitting) return;
+
     if (!passwordPolicy.test(password)) {
       alert('비밀번호는 영문과 숫자를 포함해 8자 이상이어야 합니다.');
       return;
@@ -54,7 +66,7 @@ export default function SignupForm() {
       alert('비밀번호가 일치하지 않습니다.');
       return;
     }
-    if (emailCheckStatus !== 'available') {
+    if (emailCheckStatus !== 'available' || email !== checkedEmail) {
       alert(emailCheckStatus === 'duplicate'
         ? '이미 가입된 이메일입니다.'
         : '이메일 중복확인을 진행해주세요.');
@@ -73,6 +85,7 @@ export default function SignupForm() {
       return;
     }
 
+    setIsSubmitting(true);
     try {
       await signupApi({
         email,
@@ -87,6 +100,8 @@ export default function SignupForm() {
       navigate('/login');
     } catch {
       alert('회원가입 중 오류가 발생했습니다.');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -118,8 +133,11 @@ export default function SignupForm() {
               placeholder="example@email.com" 
               value={email}
               onChange={(e) => {
-                setEmail(e.target.value);
+                const nextEmail = e.target.value;
+                emailRef.current = nextEmail;
+                setEmail(nextEmail);
                 setEmailCheckStatus('idle');
+                setCheckedEmail('');
               }}
               className="flex-1 p-2.5 rounded-lg border border-slate-300 text-xs"
               required
@@ -261,8 +279,8 @@ export default function SignupForm() {
           )}
         </div>
 
-        <button type="submit" className="w-full py-3 bg-slate-900 text-white rounded-lg font-bold text-xs mt-2 hover:bg-slate-800 transition">
-          {signupType === 'expert' ? '가입 신청서 제출 (승인 대기)' : '회원가입 완료'}
+        <button type="submit" disabled={isSubmitting} className="w-full py-3 bg-slate-900 text-white rounded-lg font-bold text-xs mt-2 hover:bg-slate-800 transition disabled:opacity-50 disabled:cursor-not-allowed">
+           {isSubmitting ? '가입 처리 중...' : signupType === 'expert' ? '가입 신청서 제출 (승인 대기)' : '회원가입 완료'}
         </button>
       </form>
     </div>
