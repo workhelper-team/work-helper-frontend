@@ -16,12 +16,10 @@ export function RouteGuard({ allowedRoles, children }: RouteGuardProps) {
   }
 
   if (allowedRoles && !allowedRoles.includes(user.role)) {
-    return (
-      <Navigate
-        to={user.role === 'ADMIN' ? '/admin/experts' : '/'}
-        replace
-      />
-    )
+    const fallback =
+      user.role === 'ADMIN' ? '/admin/experts' : user.role === 'EXPERT' ? '/expert/questions' : '/'
+
+    return <Navigate to={fallback} replace />
   }
 
   return children ?? <Outlet />

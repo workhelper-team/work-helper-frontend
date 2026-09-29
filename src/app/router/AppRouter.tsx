@@ -11,8 +11,9 @@ import CaseDetailPage from '@/features/cases/pages/CaseDetailPage'
 import CaseConsultationPage from '@/features/cases/pages/CaseConsultationPage'
 
 import { EvidencePage } from '@/pages/evidence/EvidencePage'
-import { LegalPage } from '@/pages/legal/LegalPage'
+//import { LegalPage } from '@/pages/legal/LegalPage'
 import { ExpertQnaPage } from '@/pages/expert/ExpertQnaPage'
+import { ExpertQuestionsPage } from '@/pages/expert/ExpertQuestionsPage'
 
 import { RouteGuard } from './RouteGuard'
 
@@ -29,6 +30,15 @@ export function AppRouter() {
             path="/admin/experts"
             element={<AdminExpertReviewPage />}
           />
+          {/* 관리자: 노무사 1:1 상담 전체 내역 (읽기 전용) */}
+          <Route
+            path="/admin/expert-questions"
+            element={<ExpertQuestionsPage mode="admin" />}
+          />
+        </Route>
+
+        <Route element={<RouteGuard allowedRoles={['EXPERT']} />}>
+          <Route path="/expert/questions" element={<ExpertQuestionsPage />} />
         </Route>
 
         <Route element={<RouteGuard />}>
@@ -40,15 +50,18 @@ export function AppRouter() {
             element={<CaseConsultationPage />}
           />
 
+          {/* 서류 분석/OCR 기본 화면 (사건 선택은 화면 안에서) */}
+          <Route path="/evidences" element={<EvidencePage />} />
+
           <Route
             path="/cases/:caseId/evidences"
             element={<EvidencePage />}
           />
 
-          <Route
-            path="/legal-documents"
-            element={<LegalPage />}
-          />
+          
+
+          {/* 노무사 1:1 상담 기본 화면 (일반/관리자, 사건 선택은 화면 안에서) */}
+          <Route path="/expert-qna" element={<ExpertQnaPage />} />
 
           <Route
             path="/cases/:caseId/expert-qna"

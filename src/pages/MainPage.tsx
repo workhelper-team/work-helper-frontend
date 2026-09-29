@@ -20,14 +20,28 @@ export default function WorkHelperDashboard() {
 
   const popularKeywords = ['#임금체불', '#주휴수당', '#부당해고', '#퇴직금미지급', '#직장내괴롭힘'];
 
-  const handleSearch = (keyword: string) => {
-    if (!keyword || keyword.trim().length < 2) {
-      alert('검색어는 2글자 이상 입력해주세요.');
-      return;
+  // 서류 분석/OCR: 사건 유무·개수와 무관하게 evidence 기본 화면으로 이동
+  const handleEvidenceClick = () => {
+    if (!isLoggedIn) {
+      navigate('/login')
+      return
     }
-    console.log(`[API 호출] 법률자료 검색: /api/legal-documents?keyword=${keyword}`);
-    setActiveModal('legal-search');
-  };
+
+    navigate('/evidences')
+  }
+
+  // 노무사 1:1 상담: 전문가는 답변 화면, 그 외(일반/관리자)는 기본 expert 화면으로 이동
+  const handleExpertClick = () => {
+    if (!isLoggedIn) {
+      navigate('/login')
+      return
+    }
+
+    if (currentUser?.role === 'EXPERT') return navigate('/expert/questions')
+    if (currentUser?.role === 'ADMIN') return navigate('/admin/expert-questions')
+    navigate('/expert-qna')
+  }
+
 
   const startAIConsultation = async () => {
     if (!isLoggedIn) {
@@ -68,7 +82,7 @@ export default function WorkHelperDashboard() {
     console.log('[API 호출] GET /api/cases - 내 사건 목록 조회');
     setActiveModal('cases');
   };
-
+ 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-800 font-sans">
       {/* GNB (상단 내비게이션 바) */}
@@ -83,10 +97,10 @@ export default function WorkHelperDashboard() {
           </div>
           <nav className="hidden lg:flex items-center space-x-6 text-sm font-medium text-slate-600">
             <button onClick={() => setActiveModal('ai-chat')} className="hover:text-blue-600 transition">AI 법률상담</button>
-            <button onClick={() => setActiveModal('ocr')} className="hover:text-blue-600 transition">서류 분석/OCR</button>
+            <button onClick={handleEvidenceClick} className="hover:text-blue-600 transition">서류 분석/OCR</button>
             <button onClick={() => setActiveModal('ai-chat')} className="hover:text-blue-600 transition">진정서 작성</button>
             <button onClick={handleMyCasesClick} className="hover:text-blue-600 transition">내 사건 관리</button>
-            <button onClick={() => setActiveModal('expert-guide')} className="hover:text-blue-600 transition">노무사 1:1 상담</button>
+            <button onClick={handleExpertClick} className="hover:text-blue-600 transition">노무사 1:1 상담</button>
           </nav>
           <div className="flex items-center space-x-3">
             {isLoggedIn ? (
@@ -171,10 +185,10 @@ export default function WorkHelperDashboard() {
         <div className="grid grid-cols-2 sm:grid-cols-5 gap-4 bg-white p-6 rounded-2xl shadow-md border border-slate-100">
           {[
             { title: 'AI 상담 시작', action: startAIConsultation, svg: <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/></svg> },
-            { title: '서류 OCR 분석', action: () => setActiveModal('ocr'), svg: <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg> },
+            { title: '서류 OCR 분석', action: handleEvidenceClick, svg: <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg> },
             { title: '진정서 자동작성', action: startAIConsultation, svg: <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg> },
             { title: '내 사건 조회', action: handleMyCasesClick, svg: <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/></svg> },
-            { title: '노무 상담 가이드', action: () => setActiveModal('expert-guide'), svg: <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 100-6 3 3 0 000 6z"/></svg> },
+            { title: '노무 상담 가이드', action: handleExpertClick, svg: <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 100-6 3 3 0 000 6z"/></svg> },
           ].map((item, idx) => (
             <button 
               key={idx}
