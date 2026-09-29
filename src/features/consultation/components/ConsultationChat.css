@@ -1,0 +1,393 @@
+.consultation-page {
+  width: 100%;
+  min-height: 100vh;
+  padding: 40px;
+  box-sizing: border-box;
+
+  background: #f7f5fb;
+}
+
+/* =========================
+   상단 헤더
+   ========================= */
+
+.consultation-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+
+  max-width: 1000px;
+  margin: 0 auto 24px;
+}
+
+.consultation-header-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 52px;
+  height: 52px;
+
+  border-radius: 14px;
+
+  background: #8b6fc7;
+  color: white;
+
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.consultation-header h1 {
+  margin: 0 0 6px;
+
+  color: #292333;
+  font-size: 24px;
+}
+
+.consultation-header p {
+  margin: 0;
+
+  color: #777;
+  font-size: 14px;
+}
+
+/* =========================
+   안내
+   ========================= */
+
+.consultation-notice {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+
+  max-width: 1000px;
+  margin: 0 auto 24px;
+  padding: 16px 18px;
+
+  box-sizing: border-box;
+
+  border: 1px solid #e5def5;
+  border-radius: 12px;
+
+  background: white;
+}
+
+.notice-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 24px;
+  height: 24px;
+
+  flex-shrink: 0;
+
+  border-radius: 50%;
+
+  background: #8b6fc7;
+  color: white;
+
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.consultation-notice strong {
+  display: block;
+
+  margin-bottom: 4px;
+
+  color: #4a4055;
+  font-size: 14px;
+}
+
+.consultation-notice p {
+  margin: 0;
+
+  color: #888;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+/* =========================
+   입력 페이지
+   ========================= */
+
+.consultation-input-page {
+  max-width: 1000px;
+  margin: 0 auto;
+
+  padding: 32px;
+
+  box-sizing: border-box;
+
+  border: 1px solid #e5e0eb;
+  border-radius: 18px;
+
+  background: white;
+
+  box-shadow:
+    0 6px 24px rgba(70, 50, 100, 0.06);
+}
+
+.input-page-title {
+  margin-bottom: 24px;
+}
+
+.input-page-title h2 {
+  margin: 0 0 7px;
+
+  color: #302938;
+  font-size: 20px;
+}
+
+.input-page-title p {
+  margin: 0;
+
+  color: #888;
+  font-size: 13px;
+}
+
+/* =========================
+   추천 주제
+   ========================= */
+
+.suggested-questions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+
+  margin-bottom: 24px;
+}
+
+.suggested-questions button {
+  padding: 10px 15px;
+
+  border: 1px solid #ded5eb;
+  border-radius: 20px;
+
+  background: #faf8fd;
+  color: #665779;
+
+  font-size: 13px;
+
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.suggested-questions button:hover {
+  border-color: #8b6fc7;
+  background: #f3eefb;
+}
+
+/* =========================
+   입력창
+   ========================= */
+
+.consultation-textarea-wrapper {
+  margin-bottom: 24px;
+}
+
+.consultation-textarea-wrapper label {
+  display: block;
+
+  margin-bottom: 9px;
+
+  color: #413748;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.consultation-textarea-wrapper textarea {
+  display: block;
+
+  width: 100%;
+  min-height: 300px;
+
+  padding: 18px;
+
+  box-sizing: border-box;
+
+  border: 1px solid #dcd5e5;
+  border-radius: 12px;
+
+  outline: none;
+  resize: vertical;
+
+  background: #ffffff;
+  color: #333;
+
+  font-family: inherit;
+  font-size: 14px;
+  line-height: 1.7;
+
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.consultation-textarea-wrapper textarea:focus {
+  border-color: #8b6fc7;
+
+  box-shadow:
+    0 0 0 3px rgba(139, 111, 199, 0.1);
+}
+
+.consultation-textarea-wrapper textarea::placeholder {
+  color: #b0aab5;
+}
+
+.textarea-footer {
+  display: flex;
+  justify-content: space-between;
+
+  margin-top: 7px;
+
+  color: #aaa;
+  font-size: 11px;
+}
+
+/* =========================
+   첨부자료
+   ========================= */
+
+.attachment-area {
+  padding: 18px;
+
+  border: 1px dashed #d9d0e5;
+  border-radius: 12px;
+
+  background: #fbfaff;
+}
+
+.attachment-title {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.attachment-title strong {
+  color: #4c4058;
+  font-size: 13px;
+}
+
+.optional {
+  color: #aaa;
+  font-size: 11px;
+}
+
+.attachment-area p {
+  margin: 8px 0 13px;
+
+  color: #888;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.attachment-button {
+  padding: 9px 14px;
+
+  border: 1px solid #d9d0e5;
+  border-radius: 8px;
+
+  background: white;
+  color: #665779;
+
+  font-size: 12px;
+
+  cursor: pointer;
+}
+
+.attachment-button:hover {
+  background: #f5f1fa;
+}
+
+/* =========================
+   하단 버튼
+   ========================= */
+
+.consultation-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+
+  margin-top: 28px;
+}
+
+.cancel-button,
+.submit-button {
+  padding: 12px 22px;
+
+  border-radius: 9px;
+
+  font-size: 13px;
+  font-weight: 600;
+
+  cursor: pointer;
+}
+
+.cancel-button {
+  border: 1px solid #ddd7e4;
+
+  background: white;
+  color: #777;
+}
+
+.cancel-button:hover {
+  background: #f7f5f9;
+}
+
+.submit-button {
+  border: none;
+
+  background: #8b6fc7;
+  color: white;
+}
+
+.submit-button:hover:not(:disabled) {
+  background: #7658b2;
+}
+
+.submit-button:disabled {
+  background: #d2cadc;
+  cursor: not-allowed;
+}
+
+/* =========================
+   반응형
+   ========================= */
+
+@media (max-width: 700px) {
+  .consultation-page {
+    padding: 20px;
+  }
+
+  .consultation-input-page {
+    padding: 22px;
+  }
+
+  .suggested-questions {
+    flex-direction: column;
+  }
+
+  .suggested-questions button {
+    width: 100%;
+    text-align: left;
+  }
+
+  .textarea-footer {
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .consultation-actions {
+    flex-direction: column-reverse;
+  }
+
+  .cancel-button,
+  .submit-button {
+    width: 100%;
+  }
+}
