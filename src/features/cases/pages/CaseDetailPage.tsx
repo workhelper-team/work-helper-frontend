@@ -6,6 +6,7 @@ import type { Case, CaseStatus } from '../types/case'
 
 export default function CaseDetailPage() {
   const { caseId } = useParams()
+  const validCaseId = caseId && /^[1-9]\d*$/.test(caseId) && Number.isSafeInteger(Number(caseId)) ? Number(caseId) : null
   const navigate = useNavigate()
 
   const [caseData, setCaseData] = useState<Case | null>(null)
@@ -17,13 +18,13 @@ export default function CaseDetailPage() {
 
   useEffect(() => {
     async function loadCase() {
-      if (!caseId) return
+      if (!validCaseId) return
 
       try {
         setLoading(true)
         setError(null)
 
-        const response = await getCase(Number(caseId))
+        const response = await getCase(validCaseId)
 
         setCaseData(response)
         setTitle(response.title)
@@ -37,10 +38,10 @@ export default function CaseDetailPage() {
     }
 
     loadCase()
-  }, [caseId])
+  }, [validCaseId])
 
   async function handleSave() {
-    if (!caseId || !title.trim()) {
+    if (!validCaseId || !title.trim()) {
       setError('사건 제목을 입력해주세요.')
       return
     }
@@ -49,7 +50,7 @@ export default function CaseDetailPage() {
       setSaving(true)
       setError(null)
 
-      const response = await updateCase(Number(caseId), {
+      const response = await updateCase(validCaseId, {
         title: title.trim(),
         summary: summary.trim(),
       })
@@ -66,13 +67,13 @@ export default function CaseDetailPage() {
   }
 
   async function handleStatusChange(status: CaseStatus) {
-    if (!caseId) return
+    if (!validCaseId) return
 
     try {
       setSaving(true)
       setError(null)
 
-      const response = await updateCase(Number(caseId), {
+      const response = await updateCase(validCaseId, {
         status,
       })
 
@@ -85,6 +86,10 @@ export default function CaseDetailPage() {
     } finally {
       setSaving(false)
     }
+  }
+
+  if (!validCaseId) {
+    return <div>잘못된 사건 경로입니다. <button type="button" onClick={() => navigate('/cases')}>사건 목록으로</button></div>
   }
 
   if (loading) {
@@ -146,6 +151,14 @@ export default function CaseDetailPage() {
         >
           상담하기
         </button>
+        <button
+          type="button"
+          onClick={() => navigate(`/cases/${caseData.caseId}/documents`)}
+        >
+          진정서 작성
+        </button>
+        <button type="button" onClick={() => navigate(`/cases/${caseData.caseId}/evidences`)}>증빙서류 분석</button>
+        <button type="button" onClick={() => navigate(`/cases/${caseData.caseId}/expert-qna`)}>전문가 Q&amp;A</button>
       </div>
 
       <div>

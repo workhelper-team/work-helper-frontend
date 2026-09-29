@@ -4,6 +4,7 @@ import type {
   EvidenceDetail,
   EvidenceSummary,
   EvidenceUploadResponse,
+  EvidenceUpdateRequest,
   PageResult,
 } from '@/features/evidence/types/evidence'
 
@@ -28,6 +29,11 @@ export async function getEvidenceDetail(caseId: string, evidenceId: number) {
 export async function analyzeEvidence(caseId: string, evidenceId: number) {
   const response = await apiClient.post<EvidenceAnalysisResponse>(`/api/cases/${caseId}/evidences/${evidenceId}/analysis`)
   return response.data
+}
+
+export async function updateEvidence(caseId: string, evidenceId: number, extractedText: string) {
+  const request: EvidenceUpdateRequest = { extractedText }
+  await apiClient.patch(`/api/cases/${caseId}/evidences/${evidenceId}`, request)
 }
 
 export async function deleteEvidence(caseId: string, evidenceId: number) {

@@ -60,7 +60,9 @@ export function ConsultationChat({
 
   // 상담 메시지 전송
   async function handleSendMessage() {
-    if (!content.trim()) {
+    const messageContent = content.trim()
+
+    if (!messageContent || sending) {
       return
     }
 
@@ -68,17 +70,15 @@ export function ConsultationChat({
       setSending(true)
       setError(null)
 
-      const newMessage = await sendConsultationMessage(
+      await sendConsultationMessage(
         caseId,
         {
-          content: content.trim(),
+          content: messageContent,
         },
       )
 
-      setMessages((previousMessages) => [
-        ...previousMessages,
-        newMessage,
-      ])
+      const latestMessages = await getConsultationMessages(caseId)
+      setMessages(latestMessages)
 
       setContent('')
     } catch (err) {
