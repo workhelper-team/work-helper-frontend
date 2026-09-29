@@ -19,7 +19,7 @@ export default function LoginForm() {
     setIsSubmitting(true);
     try {
       const data = await loginApi({ email, password });
-      setAuth(data.accessToken, data.user);
+      setAuth(data.accessToken, data.user, data.expiresIn);
       navigate('/');
     } catch {
       alert('로그인 정보가 일치하지 않습니다.');

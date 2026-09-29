@@ -6,6 +6,11 @@ export const loginApi = async (credentials: LoginRequest): Promise<AuthResponse>
   return response.data;
 };
 
+export const refreshLoginApi = async (): Promise<AuthResponse> => {
+  const response = await apiClient.post('/api/auth/refresh');
+  return response.data;
+};
+
 export const checkEmailAvailabilityApi = async (email: string): Promise<boolean> => {
   const response = await apiClient.get<boolean>('/api/auth/email-availability', {
     params: { email },
