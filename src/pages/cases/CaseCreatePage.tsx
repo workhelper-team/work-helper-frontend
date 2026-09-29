@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
-import { createCase } from '../api/casesApi'
+import { createCase } from '@/features/cases/api/casesApi'
 
 export default function CaseCreatePage() {
   const navigate = useNavigate()

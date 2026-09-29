@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 
-import { getCase, updateCase } from '../api/casesApi'
-import type { Case, CaseStatus } from '../types/case'
+import { getCase, updateCase } from '@/features/cases/api/casesApi'
+import type { Case, CaseStatus } from '@/features/cases/types/case'
 
 export default function CaseDetailPage() {
   const { caseId } = useParams()

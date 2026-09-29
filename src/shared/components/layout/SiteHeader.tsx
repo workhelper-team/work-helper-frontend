@@ -16,11 +16,7 @@ interface SiteHeaderProps {
 }
 
 const defaultMenuItems: SiteMenuItem[] = [
-  { label: 'AI 법률상담', to: '/legal-documents' },
-  { label: '서류 분석/OCR', to: '/cases/1/evidences' },
-  { label: '진정서 작성', to: '/cases/new' },
   { label: '내 사건 관리', to: '/cases' },
-  { label: '노무사 1:1 상담', to: '/cases/1/expert-qna' },
 ]
 
 export default function SiteHeader({ utilityActions, menuItems = defaultMenuItems, sticky = false }: SiteHeaderProps) {
