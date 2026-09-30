@@ -1,6 +1,6 @@
 import { useEffect, useState, type ReactNode } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
-import { refreshLoginApi } from '@/features/auth/api/authApi'
+import { extendLoginApi, logoutApi } from '@/features/auth/api/authApi'
 import { useAuthStore } from '@/features/auth/store/useAuthStore'
 
 export interface SiteMenuItem {
@@ -31,7 +31,7 @@ export default function SiteHeader({ utilityActions, menuItems = defaultMenuItem
   const setAuth = useAuthStore((state) => state.setAuth)
   const clearAuth = useAuthStore((state) => state.clearAuth)
   const [remainingSeconds, setRemainingSeconds] = useState<number | null>(null)
-  const [isRefreshing, setIsRefreshing] = useState(false)
+  const [isExtending, setIsExtending] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
   // 페이지 이동 시 모바일 메뉴 자동 닫힘
@@ -66,17 +66,28 @@ export default function SiteHeader({ utilityActions, menuItems = defaultMenuItem
     ? null
     : `${String(Math.floor(remainingSeconds / 60)).padStart(2, '0')}:${String(remainingSeconds % 60).padStart(2, '0')}`
 
-  const handleRefreshLogin = async () => {
-    if (isRefreshing) return
+  const handleExtendLogin = async () => {
+    if (isExtending) return
 
-    setIsRefreshing(true)
+    setIsExtending(true)
     try {
-      const data = await refreshLoginApi()
+      const data = await extendLoginApi()
       setAuth(data.accessToken, data.user, data.expiresIn)
     } catch {
       alert('로그인 연장에 실패했습니다. 다시 로그인해주세요.')
     } finally {
-      setIsRefreshing(false)
+      setIsExtending(false)
+    }
+  }
+
+  const handleLogout = async () => {
+    try {
+      await logoutApi()
+    } catch {
+      // Always clear local credentials, even when the server cannot be reached.
+    } finally {
+      clearAuth()
+      navigate('/login', { replace: true })
     }
   }
 
@@ -91,10 +102,10 @@ export default function SiteHeader({ utilityActions, menuItems = defaultMenuItem
           {formattedRemainingTime}
         </span>
       )}
-      <button type="button" onClick={() => void handleRefreshLogin()} disabled={isRefreshing} className="text-slate-600 hover:text-blue-700 disabled:opacity-50">
-        {isRefreshing ? '연장 중...' : '로그인 연장'}
+      <button type="button" onClick={() => void handleExtendLogin()} disabled={isExtending} className="text-slate-600 hover:text-blue-700 disabled:opacity-50">
+        {isExtending ? '연장 중...' : '로그인 연장'}
       </button>
-      <button type="button" onClick={clearAuth} className="text-slate-600 hover:text-blue-700">로그아웃</button>
+      <button type="button" onClick={() => void handleLogout()} className="text-slate-600 hover:text-blue-700">로그아웃</button>
     </>
   ) : (
     <>
