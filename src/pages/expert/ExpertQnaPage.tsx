@@ -1,18 +1,15 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { Link, useParams } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 import { createQuestion, getMyQuestionDetail, getMyQuestions } from '@/features/expert/api/expertApi'
 import { ExpertQuestionDetailModal } from '@/features/expert/components/ExpertQuestionDetailModal'
 import { ExpertQuestionForm } from '@/features/expert/components/ExpertQuestionForm'
 import type { ExpertQuestionDetail, ExpertQuestionSummary } from '@/features/expert/types/expertQuestion'
+import { ProtectedPageLayout } from '@/shared/components/layout/ProtectedPageLayout'
 
 const statusLabel: Record<string, string> = { WAITING: '답변 대기', ANSWERED: '답변 완료' }
 
 function isValidCaseId(value: string | undefined): value is string {
   return Boolean(value && /^[1-9]\d*$/.test(value) && Number.isSafeInteger(Number(value)))
-}
-
-function SiteHeader({ caseId }: { caseId: string | null }) {
-  return <header className="site-header"><Link className="site-brand" to="/"><b>W</b><strong>WorkHelper</strong></Link><nav><Link to={caseId ? `/cases/${caseId}/consultation` : '/cases'}>AI 상담</Link><Link to={caseId ? `/cases/${caseId}/evidences` : '/cases'}>서류 분석/OCR</Link><Link to={caseId ? `/cases/${caseId}/documents` : '/cases'}>진정서 작성</Link><Link to="/cases">내 사건 관리</Link><Link className="current-nav" to={caseId ? `/cases/${caseId}/expert-qna` : '/cases'}>전문가 Q&amp;A</Link></nav></header>
 }
 
 export function ExpertQnaPage() {
@@ -89,13 +86,11 @@ export function ExpertQnaPage() {
     return matchesStatus && item.title.toLowerCase().includes(query.toLowerCase())
   })
 
-  if (!caseId) return <div className="site-page"><SiteHeader caseId={null} /><main className="container"><p>잘못된 사건 경로입니다.</p><Link to="/cases">사건 목록으로</Link></main></div>
+  if (!caseId) return <ProtectedPageLayout title="전문가 Q&A" description="노동 문제에 대해 전문가에게 질문하고 답변을 확인해보세요." backTo="/cases" backLabel="내 사건으로"><p>잘못된 사건 경로입니다.</p></ProtectedPageLayout>
 
   return (
-    <div className="site-page">
-      <SiteHeader caseId={caseId} />
-      <section className="page-banner"><div className="container"><p className="breadcrumb">홈 &gt; 전문가 Q&amp;A</p><h1>전문가 Q&amp;A</h1><p>노동 문제에 대해 전문가에게 질문하고 답변을 확인해보세요.</p></div></section>
-      <main className="container expert-main">
+    <ProtectedPageLayout title="전문가 Q&A" description="노동 문제에 대해 전문가에게 질문하고 답변을 확인해보세요." backTo={`/cases/${caseId}`} backLabel="사건 상세로">
+      <div>
         <section className="qna-toolbar">
           <div className="filter-tabs">
             <button className={status === 'ALL' ? 'active' : ''} onClick={() => setStatus('ALL')}>전체</button>
@@ -116,9 +111,9 @@ export function ExpertQnaPage() {
                 : filteredItems.map((item) => <button className="qna-card" key={item.questionId} onClick={() => void openQuestion(item.questionId)}><div className="qna-card-copy"><div className="qna-meta"><span className="source-tag">{item.category || '노동 상담'}</span><time>작성일 {new Date(item.createdAt).toLocaleDateString('ko-KR')}</time></div><strong>{item.title}</strong><p>전문가 답변 {item.answerCount}건이 등록된 질문입니다.</p></div><span className={`analysis-badge ${item.status === 'ANSWERED' ? 'done' : ''}`}>{statusLabel[item.status] || item.status}</span><small>상세 보기 ›</small></button>)}
         </section>
         {!loading && !listError && totalPages > 1 && <nav className="form-actions" aria-label="질문 목록 페이지"><button type="button" className="outline-button" disabled={page === 0} onClick={() => setPage((current) => current - 1)}>이전</button><span>{page + 1} / {totalPages} 페이지</span><button type="button" className="outline-button" disabled={last || page + 1 >= totalPages} onClick={() => setPage((current) => current + 1)}>다음</button></nav>}
-      </main>
+      </div>
       {composeOpen && <ExpertQuestionForm onClose={() => setComposeOpen(false)} onSubmit={submitQuestion} submitting={submitting} error={formError} />}
       {detail && <ExpertQuestionDetailModal detail={detail} onClose={() => setDetail(null)} />}
-    </div>
+    </ProtectedPageLayout>
   )
 }

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { ExpertApplication } from '@/features/admin/types/expertApplication';
 import { getExpertApplicationsApi, getExpertLicenseFileApi, updateExpertStatusApi } from '@/features/admin/api/adminExpertApi';
 
@@ -6,7 +6,12 @@ export default function AdminExpertReviewPage() {
   const [applications, setApplications] = useState<ExpertApplication[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
+  const [pendingIds, setPendingIds] = useState<Set<number>>(new Set());
+  const pendingIdsRef = useRef<Set<number>>(new Set());
+  const refreshRequestId = useRef(0);
   const [searchQuery, setSearchQuery] = useState('');
+  const hasReadySelection = applications.some((application) => application.selected && !pendingIds.has(application.id));
 
   const visibleApplications = applications
     .filter((application) => {
@@ -42,23 +47,36 @@ export default function AdminExpertReviewPage() {
     const checked = e.target.checked;
     const visibleIds = new Set(visibleApplications.map(application => application.id));
     setApplications(current => current.map(app => (
-      visibleIds.has(app.id) ? { ...app, selected: checked } : app
+      visibleIds.has(app.id) && !pendingIdsRef.current.has(app.id) ? { ...app, selected: checked } : app
     )));
   };
 
   const handleSelectOne = (id: number) => {
+    if (pendingIdsRef.current.has(id)) return;
     setApplications(current => current.map(app => app.id === id ? { ...app, selected: !app.selected } : app));
   };
 
   const handleBatchStatus = async (newStatus: '승인완료' | '반려') => {
-    const selectedIds = applications.filter(app => app.selected).map(app => app.id);
+    const selectedIds = applications.filter(app => app.selected && !pendingIdsRef.current.has(app.id)).map(app => app.id);
     if (selectedIds.length === 0) return;
 
+    selectedIds.forEach((id) => pendingIdsRef.current.add(id));
+    setPendingIds(new Set(pendingIdsRef.current));
+    setError(null);
+    setSuccess(null);
+    let updated = false;
     try {
       await updateExpertStatusApi(selectedIds, newStatus);
-      setApplications(current => current.map(app => app.selected ? { ...app, status: newStatus, selected: false } : app));
+      updated = true;
+      const requestId = ++refreshRequestId.current;
+      const refreshed = await getExpertApplicationsApi();
+      if (requestId === refreshRequestId.current) setApplications(refreshed);
+      setSuccess(`${selectedIds.length}건의 심사 상태를 ${newStatus === '승인완료' ? '승인' : '반려'} 처리했습니다.`);
     } catch {
-      setError('전문가 심사 상태를 변경하지 못했습니다.');
+      setError(updated ? '심사는 처리되었지만 신청 목록을 다시 불러오지 못했습니다.' : '전문가 심사 상태를 변경하지 못했습니다.');
+    } finally {
+      selectedIds.forEach((id) => pendingIdsRef.current.delete(id));
+      setPendingIds(new Set(pendingIdsRef.current));
     }
   };
 
@@ -84,11 +102,13 @@ export default function AdminExpertReviewPage() {
         <div className="flex gap-2">
           <button 
             onClick={() => handleBatchStatus('승인완료')}
+            disabled={!hasReadySelection}
             className="px-4 py-2 bg-slate-900 text-white rounded-lg font-bold text-xs hover:bg-slate-800">
             선택 승인
           </button>
           <button 
             onClick={() => handleBatchStatus('반려')}
+            disabled={!hasReadySelection}
             className="px-4 py-2 bg-white text-rose-500 border border-slate-300 rounded-lg font-bold text-xs hover:bg-slate-50">
             선택 반려
           </button>
@@ -104,7 +124,8 @@ export default function AdminExpertReviewPage() {
         </div>
       </div>
 
-      {error && <p className="mb-4 text-xs text-rose-600">{error}</p>}
+      {error && <p className="mb-4 text-xs text-rose-600" role="alert">{error}</p>}
+      {success && <p className="mb-4 text-xs text-emerald-700" role="status">{success}</p>}
 
       <div className="border border-slate-200 rounded-xl overflow-hidden">
         <table className="w-full border-collapse text-left text-xs">
@@ -128,7 +149,7 @@ export default function AdminExpertReviewPage() {
             ) : visibleApplications.map((app) => (
               <tr key={app.id} className="border-b border-slate-100 hover:bg-slate-50">
                 <td className="p-3">
-                  <input type="checkbox" checked={app.selected} onChange={() => handleSelectOne(app.id)} />
+                  <input type="checkbox" checked={app.selected} disabled={pendingIds.has(app.id)} onChange={() => handleSelectOne(app.id)} />
                 </td>
                 <td className="p-3 text-slate-500">{app.date}</td>
                 <td className="p-3 font-bold text-slate-900">{app.name}</td>

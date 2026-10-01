@@ -16,23 +16,38 @@ export function DocumentPage() {
   const [form, setForm] = useState<DocumentUpdateRequest | null>(null)
   const [dirty, setDirty] = useState(false)
   const [activity, setActivity] = useState<'list' | 'create' | 'detail' | 'save' | 'pdf' | null>('list')
+  const [listStatus, setListStatus] = useState<'loading' | 'success' | 'error'>('loading')
   const [error, setError] = useState('')
   const [message, setMessage] = useState('')
 
   const loadList = useCallback(async (id: string) => {
-    const result = await getDocuments(id)
-    setDocuments(result)
+    try {
+      const result = await getDocuments(id)
+      setDocuments(result)
+      setListStatus('success')
+    } catch (error) {
+      setListStatus('error')
+      throw error
+    }
   }, [])
 
   useEffect(() => {
     if (!caseId) return
     let active = true
     getDocuments(caseId).then((result) => {
-      if (active) { setDocuments(result); setError('') }
-    }).catch(() => { if (active) setError('문서 목록을 불러오지 못했습니다.') })
+      if (active) { setDocuments(result); setListStatus('success'); setError('') }
+    }).catch(() => { if (active) { setListStatus('error'); setError('문서 목록을 불러오지 못했습니다.') } })
       .finally(() => { if (active) setActivity(null) })
     return () => { active = false }
   }, [caseId])
+
+  async function retryList() {
+    if (!caseId || activity) return
+    setListStatus('loading')
+    setError('')
+    try { await loadList(caseId) }
+    catch { setError('문서 목록을 불러오지 못했습니다.') }
+  }
 
   async function openDocument(documentId: number) {
     if (!caseId || activity) return
@@ -117,8 +132,13 @@ export function DocumentPage() {
           {activity === 'create' && <p className="document-progress" role="status">AI 초안을 생성하고 있습니다. 시간이 걸릴 수 있습니다.</p>}
         </section>
 
-        {activity === 'list' ? (
+        {listStatus === 'loading' ? (
           <section className="document-panel document-list-loading" role="status">문서 목록을 불러오는 중...</section>
+        ) : listStatus === 'error' ? (
+          <section className="document-panel document-list-loading" role="alert">
+            <p>문서 목록을 불러오지 못했습니다.</p>
+            <button type="button" className="document-outline-button" disabled={activity !== null} onClick={() => void retryList()}>다시 시도</button>
+          </section>
         ) : (
           <DocumentList documents={documents} selectedId={selectedId} disabled={activity !== null}
             onSelect={(id) => void openDocument(id)} />
