@@ -81,6 +81,9 @@ export default function SiteHeader({ utilityActions, menuItems = defaultMenuItem
       {user.role === 'ADMIN' && (
         <button type="button" onClick={() => navigate('/admin/experts')} className="text-slate-600 hover:text-blue-700">관리자 페이지</button>
       )}
+      {user.role === 'EXPERT' && (
+        <button type="button" onClick={() => navigate('/expert/questions')} className="text-slate-600 hover:text-blue-700">전문가 질문</button>
+      )}
       <span className="font-medium text-slate-700">{user.name}님</span>
       {formattedRemainingTime !== null && (
         <span className={`tabular-nums ${remainingSeconds !== null && remainingSeconds <= 60 ? 'text-rose-600' : 'text-slate-500'}`}>

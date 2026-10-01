@@ -13,6 +13,7 @@ import CaseConsultationPage from '@/pages/consultation/CaseConsultationPage'
 import { EvidencePage } from '@/pages/evidence/EvidencePage'
 import { DocumentPage } from '@/pages/documents/DocumentPage'
 import { ExpertQnaPage } from '@/pages/expert/ExpertQnaPage'
+import { ExpertQuestionsPage } from '@/pages/expert/ExpertQuestionsPage'
 
 import { RouteGuard } from './RouteGuard'
 
@@ -29,6 +30,10 @@ export function AppRouter() {
             path="/admin/experts"
             element={<AdminExpertReviewPage />}
           />
+        </Route>
+
+        <Route element={<RouteGuard allowedRoles={['EXPERT']} />}>
+          <Route path="/expert/questions" element={<ExpertQuestionsPage />} />
         </Route>
 
         <Route element={<RouteGuard />}>

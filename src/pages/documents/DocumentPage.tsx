@@ -1,10 +1,11 @@
 import { useCallback, useEffect, useState } from 'react'
-import { Link, useParams } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 import { createDocument, getDocument, getDocumentPdf, getDocuments, updateDocument } from '@/features/documents/api/documentApi'
 import { DocumentForm } from '@/features/documents/components/DocumentForm'
 import { DocumentList } from '@/features/documents/components/DocumentList'
 import { pdfFilename, toForm, toPatchRequest } from '@/features/documents/lib/documentHelpers'
 import type { DocumentSummary, DocumentUpdateRequest } from '@/features/documents/types/document'
+import { ProtectedPageLayout } from '@/shared/components/layout/ProtectedPageLayout'
 import './document.css'
 
 export function DocumentPage() {
@@ -92,29 +93,58 @@ export function DocumentPage() {
     finally { setActivity(null) }
   }
 
-  if (!caseId) return <main className="container document-page"><h1>노동청 진정서</h1><p>유효한 사건 ID가 필요합니다.</p><Link to="/cases">사건 목록으로</Link></main>
+  return <ProtectedPageLayout
+    title="노동청 진정서"
+    description="상담 내용을 바탕으로 진정서 초안을 작성하고 수정할 수 있습니다."
+    backTo={caseId ? `/cases/${caseId}` : '/cases'}
+    backLabel={caseId ? '사건 상세로' : '내 사건으로'}
+  >
+    {!caseId ? (
+      <div className="document-notice document-notice-error" role="alert">유효한 사건 ID가 필요합니다.</div>
+    ) : (
+      <div className="document-page">
+        {error && <p className="document-notice document-notice-error" role="alert">{error}</p>}
+        {message && <p className="document-notice document-notice-success" role="status">{message}</p>}
 
-  return <main className="container document-page">
-    <p><Link to={`/cases/${caseId}`}>사건 상세로</Link></p>
-    <h1>노동청 진정서</h1>
-    <p>AI 초안을 확인하고 필요한 내용을 수정한 뒤 저장하세요.</p>
-    {error && <p role="alert">{error}</p>}
-    {message && <p role="status">{message}</p>}
-    <button type="button" disabled={activity !== null} onClick={() => void handleCreate()}>
-      {activity === 'create' ? 'AI 초안 생성 중... 시간이 걸릴 수 있습니다.' : '진정서 초안 생성'}
-    </button>
-    {activity === 'list' ? <p>문서 목록 조회 중...</p> :
-      <DocumentList documents={documents} selectedId={selectedId} disabled={activity !== null}
-        onSelect={(id) => void openDocument(id)} />}
-    {activity === 'detail' && <p>문서 상세 조회 중...</p>}
-    {form && selectedId !== null && <section className="document-editor">
-      <h2>진정서 #{selectedId}</h2>
-      {dirty && <p>저장하지 않은 변경 사항이 있습니다. PDF는 저장 후 다운로드할 수 있습니다.</p>}
-      <DocumentForm value={form} disabled={activity !== null} saving={activity === 'save'} dirty={dirty}
-        onChange={(next) => { setForm(next); setDirty(true); setMessage('') }} onSave={() => void handleSave()} />
-      <button type="button" disabled={activity !== null || dirty} onClick={() => void handlePdf()}>
-        {activity === 'pdf' ? 'PDF 다운로드 중...' : '저장된 진정서 PDF 다운로드'}
-      </button>
-    </section>}
-  </main>
+        <section className="document-panel document-create" aria-labelledby="document-create-title">
+          <div>
+            <h2 id="document-create-title">AI 진정서 초안</h2>
+            <p>상담 내용을 바탕으로 새 초안을 생성합니다. 생성한 문서는 아래 목록에서 다시 열 수 있습니다.</p>
+          </div>
+          <button type="button" className="document-primary-button" disabled={activity !== null} onClick={() => void handleCreate()}>
+            {activity === 'create' ? 'AI 초안 생성 중...' : '진정서 초안 생성'}
+          </button>
+          {activity === 'create' && <p className="document-progress" role="status">AI 초안을 생성하고 있습니다. 시간이 걸릴 수 있습니다.</p>}
+        </section>
+
+        {activity === 'list' ? (
+          <section className="document-panel document-list-loading" role="status">문서 목록을 불러오는 중...</section>
+        ) : (
+          <DocumentList documents={documents} selectedId={selectedId} disabled={activity !== null}
+            onSelect={(id) => void openDocument(id)} />
+        )}
+        {activity === 'detail' && <p className="document-notice" role="status">문서 상세를 불러오는 중...</p>}
+
+        {form && selectedId !== null && <section className="document-editor" aria-labelledby="document-editor-title">
+          <div className="document-editor-heading">
+            <div>
+              <h2 id="document-editor-title">진정서 #{selectedId} 편집</h2>
+              <p>AI가 작성한 내용과 빈 항목을 확인한 뒤 필요한 정보를 입력하세요.</p>
+            </div>
+            <span className={dirty ? 'document-save-badge is-dirty' : 'document-save-badge'}>
+              {dirty ? '저장되지 않은 변경사항' : '저장된 내용'}
+            </span>
+          </div>
+          {dirty && <p className="document-notice document-notice-warning">저장되지 않은 변경사항이 있습니다. PDF는 저장 후 다운로드할 수 있습니다.</p>}
+          <DocumentForm value={form} disabled={activity !== null} saving={activity === 'save'} dirty={dirty}
+            onChange={(next) => { setForm(next); setDirty(true); setMessage('') }} onSave={() => void handleSave()} />
+          <div className="document-pdf-actions">
+            <button type="button" className="document-outline-button" disabled={activity !== null || dirty} onClick={() => void handlePdf()}>
+              {activity === 'pdf' ? 'PDF 다운로드 중...' : 'PDF 다운로드'}
+            </button>
+          </div>
+        </section>}
+      </div>
+    )}
+  </ProtectedPageLayout>
 }

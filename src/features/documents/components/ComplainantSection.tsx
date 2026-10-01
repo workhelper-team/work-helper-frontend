@@ -18,6 +18,7 @@ const fields: { key: Exclude<keyof Complainant, 'receiveStatus'>; label: string;
 export function ComplainantSection({ value, disabled, onChange }: Props) {
   return <fieldset disabled={disabled}>
     <legend>진정인 정보</legend>
+    <p className="document-section-description">진정을 신청하는 분의 정보를 확인하세요.</p>
     {fields.map(({ key, label, type }) => <div key={key}>
       <label htmlFor={`complainant-${key}`}>{label}</label>
       <input id={`complainant-${key}`} type={type ?? 'text'} value={value[key] ?? ''}
