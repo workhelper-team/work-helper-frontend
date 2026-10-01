@@ -18,8 +18,13 @@ export interface ExpertAnswer {
   createdAt: string
 }
 
-export interface ExpertQuestionDetail extends ExpertQuestionSummary {
+export interface ExpertQuestionDetail {
+  questionId: number
+  caseId: number
+  title: string
   content: string
+  status: QuestionStatus
+  createdAt: string
   answers: ExpertAnswer[]
 }
 

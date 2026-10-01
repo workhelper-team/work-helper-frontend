@@ -7,8 +7,12 @@ export const loginApi = async (credentials: LoginRequest): Promise<AuthResponse>
 };
 
 export const refreshLoginApi = async (): Promise<AuthResponse> => {
-  const response = await apiClient.post('/api/auth/refresh');
+  const response = await apiClient.post<AuthResponse>('/api/auth/extend');
   return response.data;
+};
+
+export const logoutApi = async (): Promise<void> => {
+  await apiClient.post('/api/auth/logout');
 };
 
 export const checkEmailAvailabilityApi = async (email: string): Promise<boolean> => {

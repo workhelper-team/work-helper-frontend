@@ -1,6 +1,6 @@
-import { useEffect, useState, type ReactNode } from 'react'
+import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
-import { refreshLoginApi } from '@/features/auth/api/authApi'
+import { logoutApi, refreshLoginApi } from '@/features/auth/api/authApi'
 import { useAuthStore } from '@/features/auth/store/useAuthStore'
 
 export interface SiteMenuItem {
@@ -28,6 +28,8 @@ export default function SiteHeader({ utilityActions, menuItems = defaultMenuItem
   const clearAuth = useAuthStore((state) => state.clearAuth)
   const [remainingSeconds, setRemainingSeconds] = useState<number | null>(null)
   const [isRefreshing, setIsRefreshing] = useState(false)
+  const [isLoggingOut, setIsLoggingOut] = useState(false)
+  const logoutPending = useRef(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
   // 페이지 이동 시 모바일 메뉴 자동 닫힘
@@ -44,19 +46,13 @@ export default function SiteHeader({ utilityActions, menuItems = defaultMenuItem
     const updateRemainingSeconds = () => {
       const remainingMilliseconds = tokenExpiresAt - Date.now()
 
-      if (remainingMilliseconds <= 0) {
-        clearAuth()
-        navigate('/login', { replace: true })
-        return
-      }
-
-      setRemainingSeconds(Math.ceil(remainingMilliseconds / 1000))
+      setRemainingSeconds(Math.max(0, Math.ceil(remainingMilliseconds / 1000)))
     }
 
     updateRemainingSeconds()
     const timerId = window.setInterval(updateRemainingSeconds, 1000)
     return () => window.clearInterval(timerId)
-  }, [clearAuth, navigate, tokenExpiresAt])
+  }, [tokenExpiresAt])
 
   const formattedRemainingTime = remainingSeconds === null
     ? null
@@ -73,6 +69,22 @@ export default function SiteHeader({ utilityActions, menuItems = defaultMenuItem
       alert('로그인 연장에 실패했습니다. 다시 로그인해주세요.')
     } finally {
       setIsRefreshing(false)
+    }
+  }
+
+  const handleLogout = async () => {
+    if (logoutPending.current) return
+    logoutPending.current = true
+    setIsLoggingOut(true)
+    try {
+      await logoutApi()
+    } catch {
+      // 서버 요청 실패 시에도 로컬 인증 상태를 정리한다.
+    } finally {
+      clearAuth()
+      navigate('/login', { replace: true })
+      logoutPending.current = false
+      setIsLoggingOut(false)
     }
   }
 
@@ -93,7 +105,7 @@ export default function SiteHeader({ utilityActions, menuItems = defaultMenuItem
       <button type="button" onClick={() => void handleRefreshLogin()} disabled={isRefreshing} className="text-slate-600 hover:text-blue-700 disabled:opacity-50">
         {isRefreshing ? '연장 중...' : '로그인 연장'}
       </button>
-      <button type="button" onClick={clearAuth} className="text-slate-600 hover:text-blue-700">로그아웃</button>
+      <button type="button" onClick={() => void handleLogout()} disabled={isLoggingOut} className="text-slate-600 hover:text-blue-700 disabled:opacity-50">{isLoggingOut ? '로그아웃 중...' : '로그아웃'}</button>
     </>
   ) : (
     <>
