@@ -1,14 +1,11 @@
 import { useCallback, useEffect, useState } from 'react'
-import { Link, useParams } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 import { EvidenceDetailModal } from '@/features/evidence/components/EvidenceDetailModal'
 import { EvidenceList } from '@/features/evidence/components/EvidenceList'
 import { EvidenceUploadForm } from '@/features/evidence/components/EvidenceUploadForm'
 import { analyzeEvidence, deleteEvidence, getEvidenceDetail, getEvidences, updateEvidence, uploadEvidence } from '@/features/evidence/api/evidenceApi'
 import type { EvidenceDetail, EvidenceSummary } from '@/features/evidence/types/evidence'
-
-function SiteHeader({ caseId }: { caseId: string | null }) {
-  return <><div className="utility-bar"><span>대한민국 근로자를 위한 고용·노동 법률 서비스 플랫폼</span></div><header className="site-header"><Link className="site-brand" to="/"><b>W</b><strong>WorkHelper</strong></Link><nav><Link to={caseId ? `/cases/${caseId}/consultation` : '/cases'}>AI 상담</Link><Link to={caseId ? `/cases/${caseId}/evidences` : '/cases'}>서류 분석/OCR</Link><Link to={caseId ? `/cases/${caseId}/documents` : '/cases'}>진정서 작성</Link><Link to="/cases">내 사건 관리</Link><Link to={caseId ? `/cases/${caseId}/expert-qna` : '/cases'}>전문가 Q&amp;A</Link></nav></header></>
-}
+import { ProtectedPageLayout } from '@/shared/components/layout/ProtectedPageLayout'
 
 function SiteFooter() {
   return <footer className="site-footer"><div className="footer-inner"><div><div className="footer-links"><strong>이용약관</strong><a href="#privacy">개인정보처리방침</a><a href="#email">이메일무단수집거부</a><a href="#sitemap">찾아오시는 길</a></div><p>(우) 04520 서울특별시 중구 청계천로 8 고용노동복지센터 / 대표번호 1544-0000<br />상담가능시간 평일 09시 ~ 오후 6시 (토요일·공휴일 휴무)<br />워크헬퍼는 법률 전문가의 공식적인 해석을 제공하지 않습니다.</p><small>Copyright © WorkHelper. All Rights Reserved.</small></div><span className="policy-mark">공공기관 정보 보안 규격 준수</span></div></footer>
@@ -22,6 +19,7 @@ export function EvidencePage() {
   const [page, setPage] = useState(0)
   const [totalPages, setTotalPages] = useState(0)
   const [loading, setLoading] = useState(true)
+  const [listError, setListError] = useState('')
   const [busyEvidenceId, setBusyEvidenceId] = useState<number | null>(null)
   const [saving, setSaving] = useState(false)
   const [message, setMessage] = useState('')
@@ -29,12 +27,16 @@ export function EvidencePage() {
   const loadEvidence = useCallback(async () => {
     if (!caseId) { setItems([]); setLoading(false); return }
     setLoading(true)
+    setListError('')
     try {
       const result = await getEvidences(caseId, page)
       setItems(result.content ?? [])
       setTotalPages(result.totalPages ?? 0)
-      setMessage('')
-    } catch { setMessage('증빙서류를 불러오지 못했습니다. 백엔드 연결을 확인해주세요.') }
+    } catch {
+      setItems([])
+      setTotalPages(0)
+      setListError('증빙서류 목록을 불러오지 못했습니다.')
+    }
     finally { setLoading(false) }
   }, [caseId, page])
 
@@ -94,17 +96,19 @@ export function EvidencePage() {
 
   const processing = busyEvidenceId !== null && detail?.evidenceId === busyEvidenceId
 
-  return <div className="site-page">
-    <SiteHeader caseId={caseId} />
-    <section className="page-banner"><div className="container"><p className="breadcrumb">홈 &gt; 내 사건 관리 &gt; 내 증빙 서류함</p><h1>내 증빙 서류함</h1><p>이전에 분석한 서류를 불러와 진정서에 반영해보세요.</p></div></section>
-    <main className="container evidence-main">
+  return <>
+    <ProtectedPageLayout title="내 증빙 서류함" description="이전에 분석한 서류를 불러와 진정서에 반영해보세요." backTo={caseId ? `/cases/${caseId}` : '/cases'} backLabel={caseId ? '사건 상세로' : '내 사건으로'}>
+    <div>
       <div className="section-title-row"><div><h2>내 증빙 서류함</h2><p>근로계약서, 급여명세서 등 사건에 필요한 자료를 관리합니다.</p></div></div>
       {!caseId && <p className="notice">유효한 사건 ID가 없어 Evidence를 불러오거나 수정할 수 없습니다.</p>}
       <EvidenceUploadForm disabled={!caseId} onUpload={handleUpload} />
       {message && <p className="notice" role="status">{message}</p>}
-      <EvidenceList items={items} loading={loading} busyEvidenceId={busyEvidenceId} page={page} totalPages={totalPages} onAnalyze={(id) => void handleAnalyze(id)} onSelect={(id) => void openDetail(id)} onPageChange={setPage} />
-    </main>
+      {caseId && (listError && !loading
+        ? <div className="empty-state" role="alert"><strong>{listError}</strong><button type="button" className="outline-button" onClick={() => void loadEvidence()}>다시 시도</button></div>
+        : <EvidenceList items={items} loading={loading} busyEvidenceId={busyEvidenceId} page={page} totalPages={totalPages} onAnalyze={(id) => void handleAnalyze(id)} onSelect={(id) => void openDetail(id)} onPageChange={setPage} />)}
+    </div>
+    </ProtectedPageLayout>
     <SiteFooter />
     {detail && <EvidenceDetailModal detail={detail} processing={processing} saving={saving} onClose={() => setDetail(null)} onAnalyze={(id) => void handleAnalyze(id)} onSave={(id, text) => void handleSaveText(id, text)} onDelete={(id) => void handleDelete(id)} />}
-  </div>
+  </>
 }

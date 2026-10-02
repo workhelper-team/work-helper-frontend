@@ -3,16 +3,17 @@ import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 import LoginPage from '@/pages/auth/LoginPage'
 import SignupPage from '@/pages/auth/SignupPage'
 import MainPage from '@/pages/MainPage'
-import AdminExpertReviewPage from '@/pages/expert/AdminExpertReviewPage'
+import AdminExpertReviewPage from '@/pages/admin/AdminExpertReviewPage'
 
-import CaseListPage from '@/features/cases/pages/CaseListPage'
-import CaseCreatePage from '@/features/cases/pages/CaseCreatePage'
-import CaseDetailPage from '@/features/cases/pages/CaseDetailPage'
-import CaseConsultationPage from '@/features/cases/pages/CaseConsultationPage'
+import CaseListPage from '@/pages/cases/CaseListPage'
+import CaseCreatePage from '@/pages/cases/CaseCreatePage'
+import CaseDetailPage from '@/pages/cases/CaseDetailPage'
+import CaseConsultationPage from '@/pages/consultation/CaseConsultationPage'
 
 import { EvidencePage } from '@/pages/evidence/EvidencePage'
 import { DocumentPage } from '@/pages/documents/DocumentPage'
 import { ExpertQnaPage } from '@/pages/expert/ExpertQnaPage'
+import { ExpertQuestionsPage } from '@/pages/expert/ExpertQuestionsPage'
 
 import { RouteGuard } from './RouteGuard'
 
@@ -29,6 +30,10 @@ export function AppRouter() {
             path="/admin/experts"
             element={<AdminExpertReviewPage />}
           />
+        </Route>
+
+        <Route element={<RouteGuard allowedRoles={['EXPERT']} />}>
+          <Route path="/expert/questions" element={<ExpertQuestionsPage />} />
         </Route>
 
         <Route element={<RouteGuard />}>

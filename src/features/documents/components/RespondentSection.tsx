@@ -16,6 +16,7 @@ const textFields: { key: 'companyName' | 'name' | 'phone' | 'address'; label: st
 export function RespondentSection({ value, disabled, onChange }: Props) {
   return <fieldset disabled={disabled}>
     <legend>피진정인 및 사업장 정보</legend>
+    <p className="document-section-description">진정 대상인 사업장과 대표자 정보를 입력하세요.</p>
     {textFields.map(({ key, label }) => <div key={key}>
       <label htmlFor={`respondent-${key}`}>{label}</label>
       <input id={`respondent-${key}`} value={value[key] ?? ''}

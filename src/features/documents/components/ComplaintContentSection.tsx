@@ -15,6 +15,7 @@ interface Props {
 export function ComplaintContentSection({ value, disabled, onChange }: Props) {
   return <fieldset disabled={disabled}>
     <legend>진정 내용</legend>
+    <p className="document-section-description">진정 사유와 관할 노동관서, 체불액을 확인하세요.</p>
     <div>
       <label htmlFor="content-claimReason">진정 사유</label>
       <textarea id="content-claimReason" rows={8} value={value.claimReason}

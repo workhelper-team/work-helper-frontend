@@ -27,15 +27,3 @@ export interface SignupRequest {
   licenseNo?: string;
   certificateFile?: File | null;
 }
-
-export interface ExpertApplication {
-  id: number;
-  date: string;
-  name: string;
-  office: string;
-  license: string;
-  file: string;
-  email: string;
-  status: '심사대기' | '승인완료' | '반려';
-  selected?: boolean;
-}

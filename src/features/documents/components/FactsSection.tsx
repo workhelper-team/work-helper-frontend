@@ -28,6 +28,7 @@ const amountFields: { key: 'unpaidWages' | 'unpaidSeverancePay' | 'unpaidOtherAm
 export function FactsSection({ value, disabled, onChange }: Props) {
   return <fieldset disabled={disabled}>
     <legend>근로 및 체불 사실</legend>
+    <p className="document-section-description">근무 기간과 미지급 금액 등 확인된 사실을 입력하세요.</p>
     {textFields.map(({ key, label, type }) => <div key={key}>
       <label htmlFor={`facts-${key}`}>{label}</label>
       <input id={`facts-${key}`} type={type ?? 'text'} value={value[key] ?? ''}

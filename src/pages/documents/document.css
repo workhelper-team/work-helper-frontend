@@ -1,24 +1,84 @@
-.document-page { padding: 32px 0 80px; }
-.document-page h1 { margin: 0 0 8px; font-size: 25px; }
-.document-page p { color: #526b8b; }
-.document-page button { cursor: pointer; }
-.document-page button:disabled { cursor: not-allowed; opacity: .6; }
-.document-page > button, .document-editor > button, .document-form > button {
-  border: 1px solid #0b326b; border-radius: 4px; background: #0b326b;
-  color: #fff; padding: 10px 15px; margin: 8px 0;
+.document-page { display: grid; gap: 24px; }
+.document-page h2 { margin: 0; color: #17253a; font-size: 19px; }
+.document-page p { margin: 0; }
+.document-panel, .document-editor {
+  border: 1px solid #dce4ef; border-radius: 6px; background: #fff;
+  padding: 24px; box-shadow: 0 2px 8px #183b6608;
 }
-.document-list { margin: 28px 0; }
-.document-list ul { list-style: none; padding: 0; display: grid; gap: 8px; }
-.document-list li button { width: 100%; text-align: left; padding: 14px;
-  border: 1px solid #dce4ef; border-radius: 5px; background: #fff; color: #17253a; }
+.document-create { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px; }
+.document-create > div { flex: 1 1 340px; }
+.document-create p, .document-section-heading p, .document-editor-heading p {
+  margin-top: 7px; color: #65758d; font-size: 13px; line-height: 1.6;
+}
+.document-primary-button, .document-outline-button {
+  border: 1px solid #0b326b; border-radius: 4px; padding: 10px 17px;
+  font: inherit; font-size: 13px; font-weight: 600; cursor: pointer;
+}
+.document-primary-button { background: #0b326b; color: #fff; }
+.document-outline-button { background: #fff; color: #0b326b; }
+.document-primary-button:hover:not(:disabled) { background: #16447f; }
+.document-outline-button:hover:not(:disabled) { background: #f3f6fb; }
+.document-page button:disabled { cursor: not-allowed; opacity: .55; }
+.document-progress { flex-basis: 100%; color: #2862b0; font-size: 13px; }
+.document-notice {
+  border: 1px solid #dce4ef; border-radius: 4px; background: #f5f8fc;
+  padding: 12px 15px; color: #526b8b; font-size: 13px; line-height: 1.6;
+}
+.document-notice-error { border-color: #fecdd3; background: #fff1f2; color: #be123c; }
+.document-notice-success { border-color: #bbf7d0; background: #f0fdf4; color: #166534; }
+.document-notice-warning { border-color: #f4c86c; background: #fff8e8; color: #9b6b15; }
+.document-list ul { display: grid; gap: 10px; list-style: none; margin: 20px 0 0; padding: 0; }
+.document-list li button {
+  width: 100%; display: flex; justify-content: space-between; align-items: center; gap: 16px;
+  border: 1px solid #dce4ef; border-radius: 5px; background: #fff;
+  padding: 16px; text-align: left; color: #17253a; cursor: pointer;
+}
+.document-list li button:hover:not(:disabled) { border-color: #94b3da; }
 .document-list li button[aria-current="true"] { border-color: #0b326b; background: #f3f6fb; }
-.document-editor { border-top: 1px solid #dce4ef; padding-top: 20px; }
-.document-form fieldset { border: 1px solid #dce4ef; border-radius: 5px; margin: 20px 0; padding: 20px; }
-.document-form legend { font-weight: 700; padding: 0 6px; }
-.document-form fieldset > div, .document-form > div { display: grid; gap: 6px; margin: 12px 0; }
-.document-form label { font-size: 13px; color: #263c5d; }
-.document-form input, .document-form select, .document-form textarea {
-  width: 100%; max-width: 640px; border: 1px solid #dce4ef; border-radius: 4px;
-  padding: 9px 11px; font: inherit; color: #17253a; background: #fff;
+.document-list-item-main, .document-list-item-meta { display: flex; align-items: center; flex-wrap: wrap; gap: 8px 12px; }
+.document-list-item-main strong { font-size: 14px; }
+.document-list-item-meta { justify-content: flex-end; color: #65758d; font-size: 11px; }
+.document-type, .document-selected-label { border-radius: 3px; padding: 4px 7px; font-size: 11px; }
+.document-type { background: #eef3f9; color: #526b8b; }
+.document-selected-label { background: #dbeafe; color: #0b326b; font-weight: 700; }
+.document-empty-state {
+  margin-top: 20px; border: 1px dashed #dce4ef; border-radius: 5px;
+  background: #f8faff; padding: 32px 16px; text-align: center;
+  color: #65758d; font-size: 13px;
 }
-.document-form textarea { resize: vertical; }
+.document-list-loading { color: #65758d; font-size: 13px; }
+.document-editor-heading { display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 12px; }
+.document-save-badge { border-radius: 4px; background: #e8f7ee; padding: 6px 9px; color: #167345; font-size: 11px; font-weight: 700; }
+.document-save-badge.is-dirty { background: #fff3d7; color: #9b7215; }
+.document-editor > .document-notice { margin-top: 20px; }
+.document-form { display: grid; gap: 18px; margin-top: 24px; }
+.document-title-field { display: grid; gap: 8px; }
+.document-title-field p { color: #65758d; font-size: 12px; }
+.document-form fieldset {
+  display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px 20px;
+  margin: 0; border: 1px solid #dce4ef; border-radius: 6px; background: #fff; padding: 22px 24px 24px;
+}
+.document-form legend { padding: 0 6px; color: #17253a; font-size: 17px; font-weight: 700; }
+.document-section-description { grid-column: 1 / -1; color: #65758d; font-size: 12px; }
+.document-form fieldset > div { display: grid; align-content: start; gap: 7px; min-width: 0; }
+.document-form fieldset:last-of-type > div:first-of-type { grid-column: 1 / -1; }
+.document-form label { color: #263c5d; font-size: 13px; font-weight: 600; }
+.document-form input, .document-form select, .document-form textarea {
+  width: 100%; min-width: 0; border: 1px solid #cbd5e1; border-radius: 4px;
+  background: #fff; padding: 10px 12px; color: #17253a; font: inherit; font-size: 13px;
+}
+.document-form input:focus, .document-form select:focus, .document-form textarea:focus {
+  border-color: #0b326b; outline: 2px solid #bfdbfe; outline-offset: 1px;
+}
+.document-form textarea { resize: vertical; line-height: 1.6; }
+.document-title-field input { max-width: 640px; }
+.document-save-actions, .document-pdf-actions { display: flex; justify-content: flex-end; }
+.document-pdf-actions { margin-top: 12px; }
+@media (max-width: 640px) {
+  .document-panel, .document-editor { padding: 18px; }
+  .document-create .document-primary-button { width: 100%; }
+  .document-list li button { align-items: flex-start; flex-direction: column; }
+  .document-list-item-meta { justify-content: flex-start; }
+  .document-form fieldset { grid-template-columns: 1fr; padding: 18px; }
+  .document-save-actions button, .document-pdf-actions button { width: 100%; }
+}

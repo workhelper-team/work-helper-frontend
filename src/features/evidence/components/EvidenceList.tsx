@@ -1,12 +1,6 @@
 import { useState } from 'react'
-import type { EvidenceStatus, EvidenceSummary } from '@/features/evidence/types/evidence'
-
-const statusLabel: Record<EvidenceStatus, string> = {
-  PENDING: '분석 대기',
-  PROCESSING: '분석 중',
-  COMPLETED: '분석 완료',
-  FAILED: '분석 실패',
-}
+import type { EvidenceSummary } from '@/features/evidence/types/evidence'
+import { statusLabel } from '../lib/evidenceStatus'
 
 interface EvidenceListProps {
   items: EvidenceSummary[]
