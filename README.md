@@ -9,6 +9,11 @@
 
 WorkHelper Frontend는 노동 문제를 겪는 사용자를 위한 React SPA입니다. 사용자가 사건을 관리하고, 사건별 상담과 증거 분석을 진행하며, 진정서를 작성하고 전문가에게 질문할 수 있는 화면을 제공합니다.
 
+## 프로젝트 보고서
+| 보고서 | 별첨 |
+| :---: | :---: |
+| [![](docs/images/report.png)](https://drive.google.com/file/d/1z77QWlTrn-q8-e5Nt0XfNtqUGK486Avh/view?usp=sharing) | [![](docs/images/etc.png)](https://drive.google.com/file/d/1F5LqKwR31_nzdSNEVt11HtvXAsZL0L_8/view?usp=sharing) |
+
 ## 팀 구성 및 역할 분담
 
 | 담당자 | 구분 | 역할 |
