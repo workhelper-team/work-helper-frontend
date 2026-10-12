@@ -1,4 +1,6 @@
+import { useRef, useState, type FormEvent } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import { createCase } from '@/features/cases/api/casesApi'
 import { useAuthStore } from '@/features/auth/store/useAuthStore'
 import SiteHeader, { type SiteMenuItem } from '../shared/components/layout/SiteHeader'
 
@@ -20,6 +22,41 @@ export default function MainPage() {
   const user = useAuthStore((state) => state.user)
   const isLoggedIn = Boolean(user)
   const navigate = useNavigate()
+  const [question, setQuestion] = useState('')
+  const [creatingCase, setCreatingCase] = useState(false)
+  const [quickConsultationError, setQuickConsultationError] = useState<string | null>(null)
+  const creationPending = useRef(false)
+
+  async function handleQuickConsultation(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault()
+    const initialQuestion = question.trim()
+    if (!initialQuestion || creationPending.current) return
+
+    const { user: currentUser, token, tokenExpiresAt } = useAuthStore.getState()
+    if (!currentUser || !token || !tokenExpiresAt || tokenExpiresAt <= Date.now()) {
+      alert('AI 상담을 시작하려면 로그인해주세요.')
+      navigate('/login')
+      return
+    }
+
+    creationPending.current = true
+    setCreatingCase(true)
+    setQuickConsultationError(null)
+    try {
+      const createdCase = await createCase({
+        title: initialQuestion.slice(0, 200),
+        category: 'WAGE',
+      })
+      navigate(`/cases/${createdCase.caseId}/consultation`, {
+        state: { initialQuestion },
+      })
+      // 화면 이동이 끝나기 전 추가 제출도 차단한다.
+    } catch {
+      setQuickConsultationError('사건을 생성하지 못했습니다. 잠시 후 다시 시도해주세요.')
+      creationPending.current = false
+      setCreatingCase(false)
+    }
+  }
 
   const handleMyCasesClick = () => {
     if (!isLoggedIn) {
@@ -49,6 +86,28 @@ export default function MainPage() {
         <section className="bg-gradient-to-b from-blue-50/60 to-white py-20 px-4 text-center border-b border-slate-100">
           <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 mb-4">근로자를 위한 노동 문제 도우미, WorkHelper</h1>
           <p className="text-slate-600 mb-8">사건을 등록하고 상담, 증빙서류 분석, 진정서 작성까지 이어가세요.</p>
+          <form onSubmit={handleQuickConsultation} className="mx-auto mb-8 max-w-3xl text-left" aria-busy={creatingCase}>
+            <label htmlFor="quick-consultation-question" className="mb-2 block text-sm font-semibold text-slate-700">빠른 AI 상담 시작</label>
+            <div className="flex gap-2 rounded-lg border border-slate-300 bg-white p-2 shadow-sm">
+              <input
+                id="quick-consultation-question"
+                type="text"
+                value={question}
+                onChange={(event) => setQuestion(event.target.value)}
+                onKeyDown={(event) => {
+                  if (event.key === 'Enter' && event.nativeEvent.isComposing) event.preventDefault()
+                }}
+                placeholder="현재 겪고 있는 노동 문제를 간단히 입력해주세요. (예: 마지막 월급을 못 받았어요)"
+                className="min-w-0 flex-1 rounded-md px-3 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-600 disabled:opacity-50"
+                disabled={creatingCase}
+              />
+              <button type="submit" disabled={creatingCase || !question.trim()} className="shrink-0 rounded-md bg-[#0b326b] px-4 py-2 text-sm font-semibold text-white hover:bg-blue-900 disabled:cursor-not-allowed disabled:opacity-50">
+                {creatingCase ? '생성 중...' : '전송'}
+              </button>
+            </div>
+            {creatingCase && <p className="mt-2 text-sm text-slate-600" role="status">상담을 위한 사건을 생성하고 있습니다.</p>}
+            {quickConsultationError && <p className="mt-2 text-sm text-rose-700" role="alert">{quickConsultationError}</p>}
+          </form>
           <div className="flex flex-wrap justify-center gap-3">
             <Link to="/cases" className="bg-blue-600 text-white px-6 py-3 rounded-lg font-medium">내 사건 관리</Link>
             <Link to="/cases/new" className="bg-white border border-blue-600 text-blue-700 px-6 py-3 rounded-lg font-medium">새 사건 등록</Link>
