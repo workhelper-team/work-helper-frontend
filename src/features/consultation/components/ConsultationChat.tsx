@@ -5,7 +5,7 @@
 // 사용자가 새로운 상담 메시지를 입력해서 전송할 수 있다.
 // ==========================================================
 
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 
 import {
   getConsultationMessages,
@@ -16,10 +16,14 @@ import type { ConsultationMessage } from '../types/consultation'
 
 interface ConsultationChatProps {
   caseId: number
+  initialQuestion?: string
+  onInitialQuestionConsumed?: () => void
 }
 
 export function ConsultationChat({
   caseId,
+  initialQuestion,
+  onInitialQuestionConsumed,
 }: ConsultationChatProps) {
   // 상담 메시지 목록
   const [messages, setMessages] = useState<ConsultationMessage[]>([])
@@ -35,9 +39,19 @@ export function ConsultationChat({
 
   // 에러 메시지
   const [error, setError] = useState<string | null>(null)
+  const [pendingMessage, setPendingMessage] = useState<string | null>(null)
+  const sendPending = useRef(false)
+  const initialQuestionConsumed = useRef(false)
+  const mounted = useRef(false)
+
+  useEffect(() => {
+    mounted.current = true
+    return () => { mounted.current = false }
+  }, [])
 
   // 사건의 상담 메시지 조회
   useEffect(() => {
+    let cancelled = false
     async function loadMessages() {
       try {
         setError(null)
@@ -45,49 +59,64 @@ export function ConsultationChat({
 
         const response = await getConsultationMessages(caseId)
 
-        setMessages(response)
+        if (!cancelled) setMessages(response)
       } catch (err) {
         console.error(err)
 
-        setError('상담 내용을 불러오지 못했습니다.')
+        if (!cancelled) setError('상담 내용을 불러오지 못했습니다.')
       } finally {
-        setLoading(false)
+        if (!cancelled) setLoading(false)
       }
     }
 
     loadMessages()
+    return () => { cancelled = true }
   }, [caseId])
 
-  // 상담 메시지 전송
-  async function handleSendMessage() {
-    const messageContent = content.trim()
-
-    if (!messageContent || sending) {
-      return
-    }
-
+  // 수동 전송과 첫 질문 자동 전송 모두 같은 POST → GET 흐름을 사용한다.
+  const sendMessage = useCallback(async (messageContent: string) => {
+    if (!messageContent || sendPending.current) return
+    sendPending.current = true
+    setSending(true)
+    setError(null)
+    setPendingMessage(messageContent)
+    setContent('')
+    let postSucceeded = false
     try {
-      setSending(true)
-      setError(null)
-
-      await sendConsultationMessage(
-        caseId,
-        {
-          content: messageContent,
-        },
-      )
-
-      const latestMessages = await getConsultationMessages(caseId)
-      setMessages(latestMessages)
-
-      setContent('')
+      await sendConsultationMessage(caseId, { content: messageContent })
+      postSucceeded = true
     } catch (err) {
       console.error(err)
-
-      setError('상담 메시지를 전송하지 못했습니다.')
-    } finally {
-      setSending(false)
+      if (mounted.current) setError('AI 응답을 받지 못했습니다. 질문이 이미 저장되었을 수 있어 자동으로 재전송하지 않습니다.')
     }
+
+    // AI 실패 시에도 USER 메시지가 저장되었을 수 있으므로 서버 상태를 확인한다.
+    try {
+      const latestMessages = await getConsultationMessages(caseId)
+      if (mounted.current) {
+        setMessages(latestMessages)
+        setPendingMessage(null)
+      }
+    } catch (err) {
+      console.error(err)
+      if (mounted.current) setError(postSucceeded
+        ? '메시지 전송은 완료됐지만 상담 내역을 불러오지 못했습니다. 페이지를 다시 열어 확인해주세요.'
+        : 'AI 요청과 상담 내역 조회에 실패했습니다. 질문 저장 여부를 확인할 수 없어 자동으로 재전송하지 않습니다.')
+    } finally {
+      sendPending.current = false
+      if (mounted.current) setSending(false)
+    }
+  }, [caseId])
+
+  useEffect(() => {
+    if (loading || !initialQuestion || initialQuestionConsumed.current) return
+    initialQuestionConsumed.current = true
+    onInitialQuestionConsumed?.()
+    void sendMessage(initialQuestion)
+  }, [loading, initialQuestion, onInitialQuestionConsumed, sendMessage])
+
+  function handleSendMessage() {
+    void sendMessage(content.trim())
   }
 
   // 로딩 중
@@ -105,7 +134,7 @@ export function ConsultationChat({
       {error && <p className="mx-5 mt-5 rounded-md border border-rose-200 bg-rose-50 p-3 text-sm text-rose-700 sm:mx-7" role="alert">{error}</p>}
 
       <div className="max-h-[560px] min-h-[320px] space-y-5 overflow-y-auto bg-slate-50/50 px-5 py-7 sm:px-7" aria-label="상담 메시지 목록">
-        {messages.length === 0 ? (
+        {messages.length === 0 && !pendingMessage ? (
           !error && <div className="flex min-h-[260px] flex-col items-center justify-center text-center">
             <p className="font-semibold text-slate-800">아직 상담 내용이 없습니다.</p>
             <p className="mt-2 text-sm text-slate-500">아래에 상담 내용을 입력해 대화를 시작하세요.</p>
@@ -123,6 +152,16 @@ export function ConsultationChat({
             </article>
           ))
         )}
+        {pendingMessage && (
+          <article className="flex justify-end">
+            <div className="max-w-[85%] rounded-md border border-blue-200 bg-blue-50 px-4 py-3 sm:max-w-[75%]">
+              <strong className="text-xs text-blue-800">나</strong>
+              <p className="mt-2 whitespace-pre-wrap break-words text-sm leading-6 text-slate-800">{pendingMessage}</p>
+              <small className="mt-2 block text-xs text-slate-500">{sending ? '전송 중...' : '저장 상태 확인 필요'}</small>
+            </div>
+          </article>
+        )}
+        {sending && <p className="text-sm text-slate-600" role="status">답변을 생성하고 있습니다...</p>}
       </div>
 
       <div className="border-t border-slate-200 bg-white p-5 sm:p-7">
