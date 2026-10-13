@@ -127,8 +127,7 @@ src/
 │  ├─ consultation/
 │  ├─ documents/
 │  ├─ evidence/
-│  ├─ expert/
-│  └─ favorites/
+│  └─ expert/
 └─ shared/       # 공통 API client, 레이아웃, 유틸리티
 ```
 
