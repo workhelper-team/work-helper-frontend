@@ -44,6 +44,15 @@ AI를 활용해 노동자의 권리를 보호하고 피해 구제 절차를 지�
 </br>
 </h3></b></div>
 
+## 누가 개발했나요?
+
+<table>
+  <tr>
+    <td><a href="https://sungjin-park530.github.io/web_portfolio/"><img src = "https://res.cloudinary.com/vrp8ghjs/image/upload/v1795673336/doc.png"></a></td>
+    <td>팀장인 저 '박성진'을 주축으로 총 6명의 팀원이 함께 개발했습니다. </br> 좌측 이미지를 클릭하시면 <b>포트폴리오 페이지</b>로 이동합니다! </td>
+  </tr>
+</table>
+
 ## 프로젝트 보고서
 | 보고서 | 별첨 |
 | :---: | :---: |
